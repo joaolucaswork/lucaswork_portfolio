@@ -1,7 +1,22 @@
-import { greetUser } from '$utils/greet';
+import { changeColor } from './utils/change-color';
+import { codeEffects } from './utils/code-effects';
+//import { dropThings } from './utils/drop-things';
+//import { flipEffect } from './utils/filp-effect';
+import { flipCard } from './utils/flip-card';
+import { lazyLoad } from './utils/lazy-load';
+import { letterEffect } from './utils/letter-effect';
+import { pageLoad } from './utils/page-load';
+import { scrollCar } from './utils/scroll-carr';
+//import { imageTrail } from './utils/image-trail';
+import { snakeGame } from './utils/snake-game';
 
-window.Webflow ||= [];
-window.Webflow.push(() => {
-  const name = 'John Doe';
-  greetUser(name);
-});
+codeEffects();
+changeColor();
+snakeGame();
+lazyLoad();
+pageLoad();
+//dropThings();
+letterEffect();
+flipCard();
+//flipEffect();
+scrollCar();

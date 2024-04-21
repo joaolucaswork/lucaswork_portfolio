@@ -39,20 +39,29 @@
     "@changesets/cli": "^2.27.1",
     "@finsweet/eslint-config": "^2.0.7",
     "@finsweet/tsconfig": "^1.3.4",
-    "@playwright/test": "^1.42.1",
-    "@typescript-eslint/eslint-plugin": "^7.1.1",
-    "@typescript-eslint/parser": "^7.1.1",
+    "@playwright/test": "^1.43.1",
+    "@types/jquery": "^3.5.29",
+    "@types/p5": "^1.7.6",
+    "@typescript-eslint/eslint-plugin": "^7.7.0",
+    "@typescript-eslint/parser": "^7.7.0",
     "cross-env": "^7.0.3",
-    "esbuild": "^0.20.1",
+    "esbuild": "^0.20.2",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
-    "eslint-plugin-simple-import-sort": "^12.0.0",
+    "eslint-plugin-simple-import-sort": "^12.1.0",
     "prettier": "^3.2.5",
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@finsweet/ts-utils": "^0.40.0"
+    "@finsweet/ts-utils": "^0.40.0",
+    "animejs": "^3.2.2",
+    "gsap": "^3.12.5",
+    "howler": "^2.2.4",
+    "jquery": "^3.7.1",
+    "matter-js": "^0.19.0",
+    "p5": "^1.9.2",
+    "swiper": "^11.1.1"
   },
   "engines": {
     "pnpm": ">=8"

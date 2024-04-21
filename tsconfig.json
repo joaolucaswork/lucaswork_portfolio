@@ -6,6 +6,7 @@
     "paths": {
       "$utils/*": ["src/utils/*"]
     },
-    "types": ["@finsweet/ts-utils"]
+    "types": ["@finsweet/ts-utils"],
+    "lib": ["es2015", "dom"] // Include "es2015" to support Promise
   }
 }
