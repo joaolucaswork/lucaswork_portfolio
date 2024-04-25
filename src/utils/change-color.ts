@@ -12,7 +12,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 export const changeColor = () => {
   gsap.registerPlugin(ScrollTrigger);
 
-  // attribute value checker
+  // attribute value checker!
   function attr(defaultVal, attrVal) {
     const defaultValType = typeof defaultVal;
     if (typeof attrVal !== 'string' || attrVal.trim() === '') return defaultVal;

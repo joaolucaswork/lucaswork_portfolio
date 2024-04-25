@@ -1,4 +1,4 @@
-# Finsweet Developer Starter !
+# Finsweet Developer Starter 2024
 
 A starter template for both Client & Power projects.
 
