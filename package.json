@@ -44,6 +44,7 @@
     "@types/p5": "^1.7.6",
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",
+    "barba.js": "^1.0.0",
     "cross-env": "^7.0.3",
     "esbuild": "^0.20.2",
     "eslint": "^8.57.0",
@@ -54,7 +55,9 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@barba/core": "^2.9.7",
     "@finsweet/ts-utils": "^0.40.0",
+    "@splinetool/viewer": "^1.1.7",
     "animejs": "^3.2.2",
     "gsap": "^3.12.5",
     "howler": "^2.2.4",

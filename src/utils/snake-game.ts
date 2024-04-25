@@ -86,8 +86,8 @@ export const snakeGame = () => {
     }
 
     // Verifica se o contador atinge 100 e mostra o vídeo com a classe "bg-akira"
-    if (counter === 60) {
-      const akiraVideo = document.querySelector('.bg-akira');
+    if (counter === 50) {
+      const akiraVideo = document.querySelector('.akira-bg_video');
       akiraVideo.style.display = 'block';
       // Se você quiser iniciar o vídeo automaticamente, você pode usar akiraVideo.play();
 

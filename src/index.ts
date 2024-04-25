@@ -1,3 +1,5 @@
+import p5 from 'p5';
+
 import { changeColor } from './utils/change-color';
 import { codeEffects } from './utils/code-effects';
 //import { dropThings } from './utils/drop-things';
@@ -5,16 +7,19 @@ import { codeEffects } from './utils/code-effects';
 import { flipCard } from './utils/flip-card';
 import { lazyLoad } from './utils/lazy-load';
 import { letterEffect } from './utils/letter-effect';
-import { pageLoad } from './utils/page-load';
+//import { pageLoad } from './utils/page-load';
+import { pageTransitions } from './utils/page-transitions';
 import { scrollCar } from './utils/scroll-carr';
-//import { imageTrail } from './utils/image-trail';
+//import { snakeAsset } from './utils/snake-asset';
 import { snakeGame } from './utils/snake-game';
 
 codeEffects();
 changeColor();
 snakeGame();
 lazyLoad();
-pageLoad();
+//snakeAsset();
+pageTransitions();
+//pageLoad();
 //dropThings();
 letterEffect();
 flipCard();
