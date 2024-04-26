@@ -23,8 +23,8 @@ export const snakeGame = () => {
   // Função para reproduzir o som quando o botão é clicado
   function playButtonClickSound() {
     const buttonClickSound = new Howl({
-      src: ['https://audio.jukehost.co.uk/J4k13PdftKYZomSioW4HhWMGtwDTo4gF'],
-      volume: 0.2, // Volume baixo
+      src: [''],
+      volume: 0, // Volume baixo
       html5: true,
       format: ['mp3'],
     });

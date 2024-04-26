@@ -11746,8 +11746,8 @@
     redDiv.style.display = "none";
     function playButtonClickSound() {
       const buttonClickSound = new import_howler.Howl({
-        src: ["https://audio.jukehost.co.uk/J4k13PdftKYZomSioW4HhWMGtwDTo4gF"],
-        volume: 0.2,
+        src: [""],
+        volume: 0,
         // Volume baixo
         html5: true,
         format: ["mp3"]
