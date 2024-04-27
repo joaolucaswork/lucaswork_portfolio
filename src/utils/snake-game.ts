@@ -113,23 +113,4 @@ export const snakeGame = () => {
 
   // Adiciona event listeners
   redDiv.addEventListener('mouseenter', moveRedDiv);
-
-  document.addEventListener('DOMContentLoaded', function () {
-    // Obtém o elemento com a classe ".change-mode"
-    const changeModeLink = document.querySelector('.change-mode');
-
-    // Adiciona um event listener de clique
-    changeModeLink.addEventListener('click', function (event) {
-      event.preventDefault(); // Impede o comportamento padrão do link
-
-      // Obtém o valor atual do atributo "element-theme" no body
-      const currentTheme = document.body.getAttribute('element-theme');
-
-      // Alterna o valor entre 1 e 2
-      const newTheme = currentTheme === '1' ? '2' : '1';
-
-      // Define o novo valor do atributo "element-theme" no body
-      document.body.setAttribute('element-theme', newTheme);
-    });
-  });
 };
