@@ -16,6 +16,7 @@ export const snakeGame = () => {
   let counter = 0;
   let trophyIndex = 0;
   let soundEnabled = true; // Controla se o som está ativado ou desativado
+  let gameStarted = false; // Controla se o jogo foi iniciado
 
   // Oculta a redDiv inicialmente
   redDiv.style.display = 'none';
@@ -32,15 +33,13 @@ export const snakeGame = () => {
   }
 
   // Adiciona um manipulador de eventos de clique ao botão "start-game"
-  startGameButton.addEventListener('click', function () {
-    // Exibe a redDiv ao clicar no botão "start-game"
-    redDiv.style.display = 'block';
+  startGameButton.addEventListener('click', startGame);
 
-    // Adiciona um evento de mouseenter à redDiv apenas quando o jogo é iniciado
-    redDiv.addEventListener('mouseenter', moveRedDiv);
-
-    // Reproduz o som quando o botão é clicado
-    playButtonClickSound();
+  // Adiciona um event listener para o evento de tecla pressionada no documento
+  document.addEventListener('keydown', function () {
+    if (!gameStarted) {
+      startGame();
+    }
   });
 
   // Trocar texto
@@ -59,8 +58,6 @@ export const snakeGame = () => {
       textSound.textContent = 'I want sound';
     }
   });
-
-  // Função para reproduzir o som do troféu
 
   // Função para mover a div vermelha
   function moveRedDiv() {
@@ -99,6 +96,24 @@ export const snakeGame = () => {
     }
   }
 
+  // Adiciona event listeners
+  redDiv.addEventListener('mouseenter', moveRedDiv);
+
+  // Função para iniciar o jogo
+  function startGame() {
+    // Exibe a redDiv ao iniciar o jogo
+    redDiv.style.display = 'block';
+
+    // Adiciona um evento de mouseenter à redDiv apenas quando o jogo é iniciado
+    redDiv.addEventListener('mouseenter', moveRedDiv);
+
+    // Reproduz o som quando o botão é clicado
+    playButtonClickSound();
+
+    // Define gameStarted como true para indicar que o jogo foi iniciado
+    gameStarted = true;
+  }
+
   // Adiciona um event listener ao botão de alternar som
   toggleSoundButton.addEventListener('click', function () {
     soundEnabled = !soundEnabled; // Inverte o estado do som
@@ -110,7 +125,4 @@ export const snakeGame = () => {
       Howler.mute(false);
     }
   });
-
-  // Adiciona event listeners
-  redDiv.addEventListener('mouseenter', moveRedDiv);
 };

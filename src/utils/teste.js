@@ -7,6 +7,7 @@ let lastMousePos = { x: 0, y: 0 };
 let isWhite = false;
 let isDrawingPaused = false;
 let isRedDivVisible = true;
+let gameStarted = false;
 
 function setup() {
   const cnv = createCanvas(windowWidth, windowHeight);
@@ -33,18 +34,24 @@ function setup() {
   const redDiv = select('#redDiv');
 
   redDiv.mouseMoved(addRect);
-
-  document.addEventListener('keydown', function (event) {
-    if (event.code === 'Space') {
+  
+  // Game settings
+  
+document.addEventListener('keydown', function (event) {
+  if (event.code === 'Space') {
+    // Verifica se o jogo já está iniciado, se não, inicia o jogo
+    if (!gameStarted) {
+      startGame();
+    } else {
+      // Se o jogo já estiver iniciado, alterna o estado de pausa
       isDrawingPaused = !isDrawingPaused;
     }
-  });
-
-  document.addEventListener('keydown', function (event) {
-    if (event.key === 'r') {
-      clearCanvas();
-    }
-  });
+  } else if (event.key === 'r') {
+    // Se a tecla "r" for pressionada, limpa o canvas e redefine o estado de pausa
+    clearCanvas();
+    isDrawingPaused = false;
+  } 
+});
 
   // Verificar o tema armazenado no cache
   const savedTheme = localStorage.getItem('theme');
@@ -52,6 +59,12 @@ function setup() {
     document.body.setAttribute('element-theme', savedTheme);
     // Se o tema for "2" (dark mode), defina isWhite como true
     isWhite = savedTheme === '2';
+  }
+   // Verificar se é um dispositivo móvel e a largura da tela, iniciar o jogo automaticamente se for menor que 430px
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const screenWidth = window.innerWidth;
+  if (isMobile && screenWidth >= 478) {
+    startGame();
   }
 }
 
@@ -79,7 +92,7 @@ function draw() {
     redDivEngolida = false;
   }
 
-  if (!isDrawingPaused) {
+  if (!isDrawingPaused && gameStarted) {
     clear();
 
     if (!isWhite) {
@@ -255,3 +268,37 @@ changeModeLink.addEventListener('click', function (event) {
   event.preventDefault();
   toggleTheme();
 });
+
+function startGame() {
+  gameStarted = true;
+}
+
+
+
+</script>
+
+<script>
+
+const copyClipboard = () => {
+  const copyButton = document.getElementById('copyClipboard');
+  const infoClip = document.getElementById('infoClip');
+  if (copyButton && infoClip) {
+    copyButton.addEventListener('click', function () {
+      // Seleciona o texto do botão
+      const buttonText = copyButton.textContent;
+
+      // Copia o texto do botão para a área de transferência
+      navigator.clipboard.writeText(buttonText)
+      .then(() => {
+        // Altera o texto do span para "✓ Copied" após a cópia bem-sucedida
+        infoClip.textContent = '✓ Copied';
+      })
+      .catch(err => {
+        console.error('Erro ao copiar texto:', err);
+      });
+    });
+  }
+};
+
+copyClipboard();
+
