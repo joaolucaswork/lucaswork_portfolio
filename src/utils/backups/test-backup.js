@@ -1,4 +1,4 @@
-const rectWidth = 30;
+/* const rectWidth = 30;
 const rectHeight = 30;
 let numRects = 4;
 const distThreshold = 10;
@@ -9,37 +9,35 @@ let isWhite = false;
 let isDrawingPaused = false;
 let isRedDivVisible = true;
 let gameStarted = false;
-
+let snakes = [];
 function updateGameStatus() {
   // Obtenha a div de notificação
   let notificationDiv = document.getElementById('notification');
 
   if (isDrawingPaused) {
     // Se o jogo estiver pausado, atualize o texto da div de notificação
-    notificationDiv.innerText = "GAME PAUSED";
+    notificationDiv.innerText = 'GAME PAUSED';
   } else if (rects.length === 0) {
     // Se o canvas foi limpo, atualize o texto da div de notificação
-    notificationDiv.innerText = "CANVA CLEARED";
+    notificationDiv.innerText = 'CANVA CLEARED';
   } else if (gameStarted) {
     // Se o jogo estiver em andamento e o canvas não foi limpo, atualize o texto da div de notificação
-    notificationDiv.innerText = "GAME ON";
+    notificationDiv.innerText = 'GAME ON';
   } else {
     // Se o jogo ainda não começou, atualize o texto da div de notificação
-    notificationDiv.innerText = "O jogo ainda não começou.";
+    notificationDiv.innerText = 'O jogo ainda não começou.';
   }
 }
 
-
 function setup() {
-
   const cnv = createCanvas(windowWidth, windowHeight);
-  
+
   cnv.parent('canvas-parent');
   cnv.style('display', 'block');
   cnv.style('position', 'absolute');
   cnv.style('inset', '0');
   cnv.style('z-index', '-1');
-  
+
   lastMousePos = { x: mouseX, y: mouseY };
 
   const changeModeLink = select('#change-mode');
@@ -56,38 +54,51 @@ function setup() {
 
   const redDiv = select('#redDiv');
 
-  redDiv.mouseMoved(addRect);
-  
-  document.getElementById('baixarArteAntiga').addEventListener('click', function () {
-  const savedImageURL = localStorage.getItem('savedImage');
-  if (savedImageURL) {
-    const downloadLink = document.createElement('a');
-    downloadLink.href = savedImageURL;
-    downloadLink.download = 'saved_pixelart.jpg';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-  } else {
-    console.error('Não há arte armazenada no cache.');
-  }
-});
+  redDiv.touchMoved(addRect); // Usar touchMoved para detectar movimentos de toque
 
-  
-  
-document.addEventListener('keydown', function (event) {
-  if (event.code === 'Space') {
-    if (!gameStarted) {
-      startGame();
-      updateGameStatus();
-    } else {
-      isDrawingPaused = !isDrawingPaused;
-     updateGameStatus();
+  redDiv.mouseMoved(addRect);
+
+  // Adicione um evento de clique para o botão snakeSize
+  const snakeSizeButton = document.getElementById('snakeSize');
+  snakeSizeButton.addEventListener('click', function () {
+    // Aumente a quantidade de retângulos
+    numRects += 5;
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.code === 'Space') {
+      if (!gameStarted) {
+        startGame();
+        updateGameStatus();
+      } else {
+        isDrawingPaused = !isDrawingPaused;
+        updateGameStatus();
+      }
+    } else if (event.key === 'r' || event.key === 'R') {
+      clearCanvas();
+      isDrawingPaused = false;
     }
-  } else if (event.key === 'r' || event.key === 'R') {
+  });
+
+  const clearButton = document.getElementById('clearBtn');
+  clearButton.addEventListener('click', function () {
     clearCanvas();
-    isDrawingPaused = false;
-}
-});
+  });
+
+  function addRectTouch() {
+    for (let i = 0; i < touches.length; i++) {
+      let touch = touches[i];
+      let { x } = touch;
+      let { y } = touch;
+      let snake = {
+        x: x,
+        y: y,
+        dx: random(-5, 5),
+        dy: random(-5, 5),
+      };
+      snakes.push(snake);
+    }
+  }
 
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme) {
@@ -95,24 +106,32 @@ document.addEventListener('keydown', function (event) {
     isWhite = savedTheme === '2';
   }
   function isMobileDevice() {
-    return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
-};
-if (isMobileDevice()) {
+    return (
+      typeof window.orientation !== 'undefined' || navigator.userAgent.indexOf('IEMobile') !== -1
+    );
+  }
+  if (isMobileDevice()) {
     startGame();
+    numRects = 10;
+  }
 }
-
-}
-  
 
 function clearCanvas() {
   rects = [];
 }
 
 function addRect() {
-  const d = dist(mouseX, mouseY, lastMousePos.x, lastMousePos.y);
+  // Se estiver em um dispositivo móvel, use touches para obter os toques atuais
+  for (let i = 0; i < touches.length; i++) {
+    const touch = touches[i];
+    const d = dist(touch.x, touch.y, mouseX, mouseY);
 
-  if (d > distThreshold) {
-    lastMousePos = { x: mouseX, y: mouseY };
+    if (d > distThreshold) {
+      rects.unshift({ x: touch.x, y: touch.y, color: color(selectedColor) });
+      while (rects.length > numRects) {
+        rects.pop();
+      }
+    }
   }
 }
 
@@ -122,10 +141,14 @@ document.getElementById('redDiv').addEventListener('mouseover', function () {
   redDivEngolida = true;
 });
 
-document.getElementById('colorPicker').addEventListener('input', function(event) {
+document.getElementById('colorPicker').addEventListener('input', function (event) {
   selectedColor = event.target.value;
 });
 
+function updateSquareCounter() {
+  const squareCounter = document.getElementById('square-counter');
+  squareCounter.innerText = rects.length.toString();
+}
 
 function draw() {
   if (redDivEngolida) {
@@ -133,41 +156,42 @@ function draw() {
     redDivEngolida = false;
   }
 
+  if (!isWhite) {
+    document.documentElement.style.setProperty('--swatch--light', '#F2F2F2');
+  }
+
   if (!isDrawingPaused && gameStarted) {
     clear();
 
-    if (!isWhite) {
-      document.documentElement.style.setProperty('--swatch--light', '#F2F2F2');
+    for (let i = 0; i < snakes.length; i++) {
+      let snake = snakes[i];
+      snake.x += snake.dx;
+      snake.y += snake.dy;
+
+      const x = snake.x - rectWidth / 2;
+      const y = snake.y - rectHeight / 2;
     }
-    
-  for (let i = 0; i < rects.length; i++) {
-    const x = rects[i].x - rectWidth / 2;
-    const y = rects[i].y - rectHeight / 2;
-    blendMode(BLEND);
-    noStroke();
-    fill(rects[i].color); // use a cor do retângulo ao desenhar
-    rect(x, y, rectWidth, rectHeight);
-  }
-    
+
+    // Desenhe os retângulos em ordem reversa, para que os mais recentes sejam desenhados por último
+    for (let i = rects.length - 1; i >= 0; i--) {
+      const x = rects[i].x - rectWidth / 2;
+      const y = rects[i].y - rectHeight / 2;
+      blendMode(BLEND);
+      noStroke();
+      fill(rects[i].color); // use a cor do retângulo ao desenhar
+      rect(x, y, rectWidth, rectHeight);
+    }
 
     const d = dist(mouseX, mouseY, lastMousePos.x, lastMousePos.y);
 
-      if (d > distThreshold) {
-  rects.unshift({ x: mouseX, y: mouseY, color: color(selectedColor) }); // use a função color() do p5.js para criar um objeto de cor
-  while (rects.length > numRects) {
-    rects.pop();
-  }
-  lastMousePos = { x: mouseX, y: mouseY };
-}
-
-for (let i = 0; i < rects.length; i++) {
-  const x = rects[i].x - rectWidth / 2;
-  const y = rects[i].y - rectHeight / 2;
-  blendMode(BLEND);
-  fill(rects[i].color); // use o objeto de cor ao desenhar
-  rect(x, y, rectWidth, rectHeight);
-}
-    
+    if (d > distThreshold) {
+      rects.unshift({ x: mouseX, y: mouseY, color: color(selectedColor) }); // use a função color() do p5.js para criar um objeto de cor
+      while (rects.length > numRects) {
+        rects.pop();
+      }
+      lastMousePos = { x: mouseX, y: mouseY };
+      updateSquareCounter(); // Chame a função para atualizar o contador de quadrados
+    }
   }
 }
 
@@ -181,7 +205,7 @@ function clearCanvas() {
 }
 
 // Obtenha a cor de fundo atual da página
-let backgroundColor = window.getComputedStyle(document.body, null).backgroundColor;
+let { backgroundColor } = window.getComputedStyle(document.body, null);
 
 // Se a cor de fundo for 'rgb(0, 0, 0)', que é equivalente a preto
 if (backgroundColor === 'rgb(0, 0, 0)') {
@@ -189,17 +213,16 @@ if (backgroundColor === 'rgb(0, 0, 0)') {
   document.getElementById('colorPicker').value = '#FFFFFF';
 }
 
-
 function saveArt() {
   let tempCanvas = document.createElement('canvas');
   tempCanvas.width = width;
   tempCanvas.height = height;
   let tempCtx = tempCanvas.getContext('2d');
-  
-  let backgroundColor = window.getComputedStyle(document.body, null).backgroundColor;
-  
-// Altere a cor de fundo com base no valor de isWhite
- tempCtx.fillStyle = backgroundColor;
+
+  let { backgroundColor } = window.getComputedStyle(document.body, null);
+
+  // Altere a cor de fundo com base no valor de isWhite
+  tempCtx.fillStyle = backgroundColor;
   tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
   for (let i = 0; i < rects.length; i++) {
@@ -229,50 +252,6 @@ function saveArt() {
   let downloadBtn = document.getElementById('baixarArte');
   downloadBtn.href = imageURL;
   downloadBtn.download = 'my_art.jpg';
-  
-
-  Tesseract.recognize(imageURL, 'eng', { logger: (m) => console.log(m) }).then(
-    ({ data: { text } }) => {
-      console.log('Texto reconhecido:', text);
-      if (text === null || text.trim() === '') {
-        console.log('Erro: Não foi possível reconhecer texto na imagem.');
-      } else {
-        let lowerCaseText = text.toLowerCase();
-        let regex = /kill[-\s]*bill/g;
-        if (lowerCaseText.match(regex)) {
-          console.log('Palavra "kill bill" ou variação identificada!');
-          document.getElementById('imagem').src =
-            'https://uploads-ssl.webflow.com/6617e4fc3b3950260690670d/662c69da6e0e4feedf61aaea_kill-bill.jpg';
-        } else {
-          console.log('Palavra "kill bill" ou variação não identificada.');
-          text = corrigirErrosOrtograficos(text);
-          text = normalizarPalavras(text);
-          text = corrigirQuebrasDeLinha(text);
-          if (text.match(regex)) {
-            console.log('Palavra "kill bill" ou variação identificada após o pós-processamento!');
-            document.getElementById('imagem').src =
-              'https://uploads-ssl.webflow.com/6617e4fc3b3950260690670d/662c69da6e0e4feedf61aaea_kill-bill.jpg';
-          } else {
-            console.log(
-              'Palavra "kill bill" ou variação não identificada após o pós-processamento.'
-            );
-          }
-        }
-      }
-    }
-  );
-
-  function corrigirErrosOrtograficos(text) {
-    return text;
-  }
-
-  function normalizarPalavras(text) {
-    return text;
-  }
-
-  function corrigirQuebrasDeLinha(text) {
-    return text;
-  }
 
   localStorage.setItem('savedImage', imageURL);
 }
@@ -307,43 +286,14 @@ window.addEventListener('load', function () {
   }
 });
 
-
-
 const changeModeLink = document.querySelector('.change-mode');
 changeModeLink.addEventListener('click', function (event) {
   event.preventDefault();
   toggleTheme();
 });
 
-
 function startGame() {
   gameStarted = true;
   updateGameStatus();
 }
-
-</script>
-
-<script>
-const copyClipboard = () => {
-  const copyButton = document.getElementById('copyClipboard');
-  const infoClip = document.getElementById('infoClip');
-  if (copyButton && infoClip) {
-    copyButton.addEventListener('click', function () {
-      // Seleciona o texto do botão
-      const buttonText = copyButton.textContent;
-      navigator.clipboard.writeText(buttonText)
-      .then(() => {
-        infoClip.textContent = '✓ Copied';
-      })
-      .catch(err => {
-        console.error('Erro ao copiar texto:', err);
-      });
-    });
-  }
-};
-copyClipboard();
-
-
-
-
-
+ */
