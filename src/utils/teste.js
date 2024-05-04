@@ -2,6 +2,7 @@ const rectWidth = 30;
 const rectHeight = 30;
 let numRects = 4;
 const distThreshold = 10;
+let selectedColor = '#000000'; // preto como cor padrão
 let rects = [];
 let lastMousePos = { x: 0, y: 0 };
 let isWhite = false;
@@ -9,14 +10,36 @@ let isDrawingPaused = false;
 let isRedDivVisible = true;
 let gameStarted = false;
 
+function updateGameStatus() {
+  // Obtenha a div de notificação
+  let notificationDiv = document.getElementById('notification');
+
+  if (isDrawingPaused) {
+    // Se o jogo estiver pausado, atualize o texto da div de notificação
+    notificationDiv.innerText = "GAME PAUSED";
+  } else if (rects.length === 0) {
+    // Se o canvas foi limpo, atualize o texto da div de notificação
+    notificationDiv.innerText = "CANVA CLEARED";
+  } else if (gameStarted) {
+    // Se o jogo estiver em andamento e o canvas não foi limpo, atualize o texto da div de notificação
+    notificationDiv.innerText = "GAME ON";
+  } else {
+    // Se o jogo ainda não começou, atualize o texto da div de notificação
+    notificationDiv.innerText = "O jogo ainda não começou.";
+  }
+}
+
+
 function setup() {
+
   const cnv = createCanvas(windowWidth, windowHeight);
+  
   cnv.parent('canvas-parent');
   cnv.style('display', 'block');
   cnv.style('position', 'absolute');
   cnv.style('inset', '0');
   cnv.style('z-index', '-1');
-
+  
   lastMousePos = { x: mouseX, y: mouseY };
 
   const changeModeLink = select('#change-mode');
@@ -35,37 +58,48 @@ function setup() {
 
   redDiv.mouseMoved(addRect);
   
-  // Game settings
+  document.getElementById('baixarArteAntiga').addEventListener('click', function () {
+  const savedImageURL = localStorage.getItem('savedImage');
+  if (savedImageURL) {
+    const downloadLink = document.createElement('a');
+    downloadLink.href = savedImageURL;
+    downloadLink.download = 'saved_pixelart.jpg';
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  } else {
+    console.error('Não há arte armazenada no cache.');
+  }
+});
+
+  
   
 document.addEventListener('keydown', function (event) {
   if (event.code === 'Space') {
-    // Verifica se o jogo já está iniciado, se não, inicia o jogo
     if (!gameStarted) {
       startGame();
+      updateGameStatus();
     } else {
-      // Se o jogo já estiver iniciado, alterna o estado de pausa
       isDrawingPaused = !isDrawingPaused;
+     updateGameStatus();
     }
-  } else if (event.key === 'r') {
-    // Se a tecla "r" for pressionada, limpa o canvas e redefine o estado de pausa
+  } else if (event.key === 'r' || event.key === 'R') {
     clearCanvas();
     isDrawingPaused = false;
-  } 
+}
 });
 
-  // Verificar o tema armazenado no cache
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme) {
     document.body.setAttribute('element-theme', savedTheme);
-    // Se o tema for "2" (dark mode), defina isWhite como true
     isWhite = savedTheme === '2';
   }
-   // Verificar se é um dispositivo móvel e a largura da tela, iniciar o jogo automaticamente se for menor que 430px
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   const screenWidth = window.innerWidth;
   if (isMobile && screenWidth >= 478) {
     startGame();
   }
+  
 }
 
 function clearCanvas() {
@@ -86,6 +120,11 @@ document.getElementById('redDiv').addEventListener('mouseover', function () {
   redDivEngolida = true;
 });
 
+document.getElementById('colorPicker').addEventListener('input', function(event) {
+  selectedColor = event.target.value;
+});
+
+
 function draw() {
   if (redDivEngolida) {
     numRects += 30;
@@ -98,23 +137,35 @@ function draw() {
     if (!isWhite) {
       document.documentElement.style.setProperty('--swatch--light', '#F2F2F2');
     }
+    
+  for (let i = 0; i < rects.length; i++) {
+    const x = rects[i].x - rectWidth / 2;
+    const y = rects[i].y - rectHeight / 2;
+    blendMode(BLEND);
+    noStroke();
+    fill(rects[i].color); // use a cor do retângulo ao desenhar
+    rect(x, y, rectWidth, rectHeight);
+  }
+    
 
     const d = dist(mouseX, mouseY, lastMousePos.x, lastMousePos.y);
 
-    if (d > distThreshold) {
-      rects.unshift({ x: mouseX, y: mouseY });
-      while (rects.length > numRects) {
-        rects.pop();
-      }
-      lastMousePos = { x: mouseX, y: mouseY };
-    }
-    for (let i = 0; i < rects.length; i++) {
-      const x = rects[i].x - rectWidth / 2;
-      const y = rects[i].y - rectHeight / 2;
-      blendMode(BLEND);
-      fill(isWhite ? 255 : 0); // Alterado para levar em consideração o valor de isWhite
-      rect(x, y, rectWidth, rectHeight);
-    }
+      if (d > distThreshold) {
+  rects.unshift({ x: mouseX, y: mouseY, color: color(selectedColor) }); // use a função color() do p5.js para criar um objeto de cor
+  while (rects.length > numRects) {
+    rects.pop();
+  }
+  lastMousePos = { x: mouseX, y: mouseY };
+}
+
+for (let i = 0; i < rects.length; i++) {
+  const x = rects[i].x - rectWidth / 2;
+  const y = rects[i].y - rectHeight / 2;
+  blendMode(BLEND);
+  fill(rects[i].color); // use o objeto de cor ao desenhar
+  rect(x, y, rectWidth, rectHeight);
+}
+    
   }
 }
 
@@ -124,20 +175,35 @@ function toggleColor() {
 
 function clearCanvas() {
   rects = [];
+  updateGameStatus();
 }
+
+// Obtenha a cor de fundo atual da página
+let backgroundColor = window.getComputedStyle(document.body, null).backgroundColor;
+
+// Se a cor de fundo for 'rgb(0, 0, 0)', que é equivalente a preto
+if (backgroundColor === 'rgb(0, 0, 0)') {
+  // Defina o valor do colorPicker para branco
+  document.getElementById('colorPicker').value = '#FFFFFF';
+}
+
 
 function saveArt() {
   let tempCanvas = document.createElement('canvas');
   tempCanvas.width = width;
   tempCanvas.height = height;
   let tempCtx = tempCanvas.getContext('2d');
-  tempCtx.fillStyle = document.documentElement.style.getPropertyValue('--swatch--light');
+  
+  let backgroundColor = window.getComputedStyle(document.body, null).backgroundColor;
+  
+// Altere a cor de fundo com base no valor de isWhite
+ tempCtx.fillStyle = backgroundColor;
   tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
-  tempCtx.fillStyle = '#000000';
   for (let i = 0; i < rects.length; i++) {
     const x = rects[i].x - rectWidth / 2;
     const y = rects[i].y - rectHeight / 2;
+    tempCtx.fillStyle = rects[i].color.toString(); // use a cor original do retângulo
     tempCtx.fillRect(x, y, rectWidth, rectHeight);
   }
 
@@ -161,6 +227,7 @@ function saveArt() {
   let downloadBtn = document.getElementById('baixarArte');
   downloadBtn.href = imageURL;
   downloadBtn.download = 'my_art.jpg';
+  
 
   Tesseract.recognize(imageURL, 'eng', { logger: (m) => console.log(m) }).then(
     ({ data: { text } }) => {
@@ -208,11 +275,9 @@ function saveArt() {
   localStorage.setItem('savedImage', imageURL);
 }
 
-// Load saved image from localStorage when the page loads
 window.addEventListener('load', function () {
   const savedImageURL = localStorage.getItem('savedImage');
   if (savedImageURL) {
-    // Display the saved image on the canvas
     const img = new Image();
     img.onload = function () {
       const canvas = document.getElementById('canvaMain');
@@ -225,36 +290,14 @@ window.addEventListener('load', function () {
   }
 });
 
-document.getElementById('baixarArteAntiga').addEventListener('click', function () {
-  // Recupere a arte armazenada no cache
-  const savedImageURL = localStorage.getItem('savedImage');
-  if (savedImageURL) {
-    // Crie um link temporário para iniciar o download
-    const downloadLink = document.createElement('a');
-    downloadLink.href = savedImageURL;
-    downloadLink.download = 'saved_pixelart.jpg'; // Nome do arquivo para download
-    // Adicione o link temporário ao corpo do documento
-    document.body.appendChild(downloadLink);
-    // Inicie o download
-    downloadLink.click();
-    // Remova o link temporário do corpo do documento
-    document.body.removeChild(downloadLink);
-  } else {
-    // Se a arte não estiver disponível no cache, exiba uma mensagem de erro
-    console.error('Não há arte armazenada no cache.');
-  }
-});
-
 function toggleTheme() {
   const currentTheme = document.body.getAttribute('element-theme');
   const newTheme = currentTheme === '1' ? '2' : '1';
   document.body.setAttribute('element-theme', newTheme);
 
-  // Salvar a escolha do tema no cache
   localStorage.setItem('theme', newTheme);
 }
 
-// Verificar se há um tema armazenado no cache e aplicá-lo ao carregar a página
 window.addEventListener('load', function () {
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme) {
@@ -262,23 +305,23 @@ window.addEventListener('load', function () {
   }
 });
 
-// Adicionar um evento de clique ao botão para trocar entre light mode e dark mode e salvar a escolha no cache
+
+
 const changeModeLink = document.querySelector('.change-mode');
 changeModeLink.addEventListener('click', function (event) {
   event.preventDefault();
   toggleTheme();
 });
 
+
 function startGame() {
   gameStarted = true;
+  updateGameStatus();
 }
-
-
 
 </script>
 
 <script>
-
 const copyClipboard = () => {
   const copyButton = document.getElementById('copyClipboard');
   const infoClip = document.getElementById('infoClip');
@@ -286,11 +329,8 @@ const copyClipboard = () => {
     copyButton.addEventListener('click', function () {
       // Seleciona o texto do botão
       const buttonText = copyButton.textContent;
-
-      // Copia o texto do botão para a área de transferência
       navigator.clipboard.writeText(buttonText)
       .then(() => {
-        // Altera o texto do span para "✓ Copied" após a cópia bem-sucedida
         infoClip.textContent = '✓ Copied';
       })
       .catch(err => {
@@ -299,6 +339,6 @@ const copyClipboard = () => {
     });
   }
 };
-
 copyClipboard();
+
 
