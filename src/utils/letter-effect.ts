@@ -7,7 +7,7 @@ export const letterEffect = () => {
   // Journal IN
   const SlideupPara = animejs.timeline({
     loop: false,
-    autoplay: false, // desativado para controlar manualmente
+    autoplay: true, // desativado para controlar manualmente
   });
 
   SlideupPara.add({
@@ -17,8 +17,6 @@ export const letterEffect = () => {
     opacity: [0, 1],
     easing: 'easeOutExpo',
     duration: 1800,
-    delay: (el, i) => 1000 + 60 * i,
+    delay: (el, i) => 500 + 110 * i,
   });
-
-  SlideupPara.play();
 };
