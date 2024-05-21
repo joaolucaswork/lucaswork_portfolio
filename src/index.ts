@@ -2,7 +2,7 @@
 import p5 from 'p5';
 
 import { snakeGame } from '$utils/game-code/snake-game';
-import { letterEffect } from '$utils/letter-effect';
+import { pageTransition } from '$utils/page-transition';
 
 snakeGame();
-letterEffect();
+pageTransition();
