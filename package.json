@@ -1,6 +1,6 @@
 {
   "name": "@joaolucas_work/portfolio",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Repository for lucaswork portfolio.",
   "homepage": "https://github.com/joaolucaswork/lucaswork_portfolio/#readme",
   "license": "ISC",
@@ -70,6 +70,7 @@
     "@swup/route-name-plugin": "^4.1.0",
     "@swup/scripts-plugin": "^2.1.0",
     "@tensorflow/tfjs": "^4.19.0",
+    "@unseenco/taxi": "^1.6.0",
     "animejs": "^3.2.2",
     "c2.js": "^1.0.8",
     "gsap": "^3.12.5",
@@ -77,6 +78,7 @@
     "jquery": "^3.7.1",
     "jspdf-html2canvas": "^1.5.2",
     "matter-js": "^0.19.0",
+    "muuri": "^0.9.5",
     "p5": "^1.9.2",
     "pagemap": "^1.4.0",
     "swiper": "^11.1.1",
